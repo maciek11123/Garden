@@ -1,0 +1,19 @@
+{
+  "name": "Zen Garden",
+  "short_name": "Zen Garden",
+  "description": "Interactive 3D Zen Garden - touch to bloom flowers",
+  "start_url": "/Garden/",
+  "scope": "/Garden/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#74B9FF",
+  "theme_color": "#74B9FF",
+  "icons": [
+    {
+      "src": "/Garden/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
