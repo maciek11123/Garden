@@ -1,4 +1,4 @@
-const CACHE = 'zen-garden-v5';
+const CACHE = 'zen-garden-v6';
 const ASSETS = [
   '/Garden/',
   '/Garden/index.html',
