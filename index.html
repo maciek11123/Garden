@@ -5,16 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Zen Garden</title>
 
-    <!-- PWA -->
+    <!-- PWA meta -->
     <meta name="application-name" content="Zen Garden">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Zen Garden">
     <meta name="theme-color" content="#74B9FF">
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
+    <meta name="msapplication-TileColor" content="#74B9FF">
+
+    <!-- Inline SVG icon as data URI for apple-touch-icon and manifest -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='90' fill='%2374B9FF'/%3E%3Ccircle cx='256' cy='200' r='110' fill='%234CA832'/%3E%3Ccircle cx='200' cy='220' r='80' fill='%236ABF3E'/%3E%3Ccircle cx='310' cy='215' r='85' fill='%235AAA2A'/%3E%3Crect x='245' y='290' width='22' height='90' rx='8' fill='%237A5230'/%3E%3Cellipse cx='256' cy='390' rx='90' ry='18' fill='%233d6b15'/%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='90' fill='%2374B9FF'/%3E%3Ccircle cx='256' cy='200' r='110' fill='%234CA832'/%3E%3Ccircle cx='200' cy='220' r='80' fill='%236ABF3E'/%3E%3Ccircle cx='310' cy='215' r='85' fill='%235AAA2A'/%3E%3Crect x='245' y='290' width='22' height='90' rx='8' fill='%237A5230'/%3E%3Cellipse cx='256' cy='390' rx='90' ry='18' fill='%233d6b15'/%3E%3C/svg%3E">
+
+    <!-- PWA Manifest embedded as data URI -->
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Zen%20Garden%22%2C%22short_name%22%3A%22Zen%22%2C%22description%22%3A%22Interactive%20low-poly%20zen%20garden%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22any%22%2C%22background_color%22%3A%22%2374B9FF%22%2C%22theme_color%22%3A%22%2374B9FF%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%2520viewBox%3D'0%25200%2520512%2520512'%253E%253Crect%2520width%3D'512'%2520height%3D'512'%2520rx%3D'90'%2520fill%3D'%252374B9FF'%2F%253E%253Ccircle%2520cx%3D'256'%2520cy%3D'200'%2520r%3D'110'%2520fill%3D'%25234CA832'%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { overflow: hidden; background: #74B9FF; font-family: 'Georgia', serif; }
@@ -1460,42 +1465,32 @@
 
     // ─── SERVICE WORKER ─────────────────────────────────────────────────────────
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
+        navigator.serviceWorker.register('./sw.js', { scope: './' })
             .then(reg => {
-                console.log('[ZenGarden] SW ready');
+                console.log('[ZenGarden] SW registered', reg.scope);
                 window.addEventListener('beforeinstallprompt', e => {
                     e.preventDefault();
-                    window._dip = e;
+                    window._installPrompt = e;
                     const btn = document.createElement('button');
+                    btn.id = 'install-btn';
                     btn.textContent = '⬇ Install App';
                     btn.style.cssText = [
-                        'position:fixed','bottom:28px','left:50%',
-                        'transform:translateX(-50%)',
-                        'background:rgba(0,0,0,0.45)',
-                        'backdrop-filter:blur(12px)',
-                        'color:#fff','border:none',
-                        'padding:11px 26px','border-radius:22px',
-                        'font-size:13px','font-family:Georgia,serif',
-                        'letter-spacing:0.07em','cursor:pointer',
-                        'z-index:9999','box-shadow:0 2px 12px rgba(0,0,0,0.3)',
-                        'transition:opacity 0.5s,transform 0.2s'
+                        'position:fixed','bottom:24px','left:50%','transform:translateX(-50%)',
+                        'background:rgba(0,0,0,0.35)','backdrop-filter:blur(10px)',
+                        'color:rgba(255,255,255,0.9)','border:none','padding:10px 22px',
+                        'border-radius:20px','font-size:13px','font-family:Georgia,serif',
+                        'letter-spacing:0.06em','cursor:pointer','z-index:999',
+                        'transition:opacity 0.4s'
                     ].join(';');
                     btn.addEventListener('click', () => {
-                        window._dip.prompt();
-                        window._dip.userChoice.then(() => btn.remove());
+                        window._installPrompt.prompt();
+                        window._installPrompt.userChoice.then(() => btn.remove());
                     });
                     document.body.appendChild(btn);
-                    setTimeout(() => {
-                        btn.style.opacity = '0';
-                        setTimeout(() => btn.remove(), 600);
-                    }, 10000);
+                    setTimeout(() => { btn.style.opacity = '0'; setTimeout(() => btn.remove(), 500); }, 8000);
                 });
-                // Already installed — hide install button if in standalone
-                if (window.matchMedia('(display-mode: standalone)').matches) {
-                    console.log('[ZenGarden] Running as installed PWA');
-                }
             })
-            .catch(e => console.warn('[ZenGarden] SW failed:', e));
+            .catch(err => console.warn('[ZenGarden] SW failed:', err));
     }
     </script>
 </body>
